@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orçamento de Móveis Planejados</title>
+<meta name="description" content="Programa para Windows que calcula o MDF, a fita e as ferragens de cada móvel, mostra o custo e o preço com a sua margem e gera o orçamento do cliente com a sua logo. Pagamento único, sem mensalidade, sem internet.">
+<meta property="og:title" content="Orçamento de Móveis Planejados">
+<meta property="og:description" content="Digite as medidas e o orçamento sai pronto, com o preço certo. Programa para Windows, pagamento único.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://oliveirabrl.github.io/orcamento-moveis/">
+<meta property="og:image" content="https://oliveirabrl.github.io/orcamento-moveis/img/compartilhar.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Josefin+Slab:wght@600;700&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Mesmo layout da página do Controle Financeiro Pessoal, na cor do produto (marrom madeira) com acento ocre. */
+:root {
+  --bg: #f6f4ef; --card: #ffffff; --ink: #1a1c1e; --soft: #5b6167; --line: #e2ddd3;
+  --brand: #6b4226; --brand-hover: #573419; --brand-ink: #ffffff; --brand-soft: #f2e7dc;
+  --gold: #b8860b; --gold-soft: #f7eed6; --gold-ink: #7a5800; --warn: #a3352b;
+  --win: #e9e5dc; --win-ink: #3a3f44; --shadow: 0 1px 2px rgba(26,28,30,.06), 0 12px 32px -12px rgba(26,28,30,.22);
+  --logo-claro: inline-block; --logo-escuro: none;
+  --f-display: 'Josefin Slab', Rockwell, 'Roboto Slab', Georgia, serif;
+  --f-body: 'Public Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #161412; --card: #1f1b18; --ink: #ecebe6; --soft: #aba59f; --line: #342d27;
+  --brand: #a8703f; --brand-hover: #b9804c; --brand-ink: #ffffff; --brand-soft: #2a211a;
+  --gold: #d7a944; --gold-soft: #2b2515; --gold-ink: #e6c06a; --warn: #e48174;
+  --win: #2a2521; --win-ink: #cfc9c2; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 14px 34px -12px rgba(0,0,0,.6);
+  --logo-claro: none; --logo-escuro: inline-block; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #161412; --card: #1f1b18; --ink: #ecebe6; --soft: #aba59f; --line: #342d27;
+  --brand: #a8703f; --brand-hover: #b9804c; --brand-ink: #ffffff; --brand-soft: #2a211a;
+  --gold: #d7a944; --gold-soft: #2b2515; --gold-ink: #e6c06a; --warn: #e48174;
+  --win: #2a2521; --win-ink: #cfc9c2; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 14px 34px -12px rgba(0,0,0,.6);
+  --logo-claro: none; --logo-escuro: inline-block; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; display: block; }
+a { color: var(--brand); text-underline-offset: 3px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.12; letter-spacing: -.005em; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.num { font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+
+.rascunho { background: var(--gold-soft); color: var(--gold-ink); font-size: 13.5px; border-bottom: 1px solid var(--line); }
+.rascunho .wrap { padding-block: 9px; }
+
+.topo { border-bottom: 1px solid var(--line); background: var(--bg); }
+.topo .wrap { display: flex; align-items: center; gap: 24px; padding-block: 16px; }
+.logo img { height: 26px; width: auto; }
+.logo .l-claro { display: var(--logo-claro); } .logo .l-escuro { display: var(--logo-escuro); }
+.topo nav { display: flex; gap: 22px; margin-left: auto; font-size: 14.5px; }
+.topo nav a { color: var(--soft); text-decoration: none; }
+.topo nav a:hover { color: var(--ink); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 8px; font: 600 15.5px/1 var(--f-body); padding: 15px 22px; text-decoration: none; cursor: pointer; transition: background .15s; }
+.btn-p { background: var(--brand); color: var(--brand-ink); }
+.btn-p:hover { background: var(--brand-hover); }
+.btn-s { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
+.btn-s:hover { box-shadow: inset 0 0 0 1.5px var(--soft); }
+.btn-sm { padding: 10px 16px; font-size: 14px; }
+
+.heroi { padding-block: 56px 40px; }
+.heroi .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 52px; align-items: center; }
+.selo { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--gold-ink); margin-bottom: 16px; }
+.heroi h1 { font-size: clamp(36px, 5vw, 56px); }
+.heroi .lead { font-size: 18px; color: var(--soft); margin-top: 18px; max-width: 34em; }
+.preco { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+.preco strong { font: 700 34px/1 var(--f-body); letter-spacing: -.02em; }
+.preco span { color: var(--soft); font-size: 14.5px; }
+.lanc { display: inline-block; margin-top: 12px; font-size: 14px; font-weight: 500; color: var(--gold-ink); background: var(--gold-soft); padding: 7px 12px; border-radius: 6px; }
+.compra-info .lanc { margin-top: -4px; align-self: flex-start; }
+.acoes { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+.garantias { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 22px 0 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--soft); }
+.garantias li::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); margin-right: 8px; vertical-align: 2px; }
+
+.janela { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+.janela-barra { display: flex; align-items: center; background: var(--win); color: var(--win-ink); font-size: 12px; padding: 0 0 0 12px; height: 32px; }
+.janela-barra b { font-weight: 500; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.janela-barra i { width: 42px; height: 32px; display: grid; place-items: center; font-style: normal; font-size: 13px; opacity: .75; }
+.janela img { width: 100%; height: auto; background: #f6f4ef; }
+
+.faixa { border-block: 1px solid var(--line); background: var(--card); }
+.faixa ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; list-style: none; margin: 0; padding: 26px 0; }
+.faixa b { display: block; font-size: 15px; margin-bottom: 2px; }
+.faixa span { font-size: 14px; color: var(--soft); }
+
+.secao { padding-block: 76px; }
+.secao-tit { max-width: 40em; margin-bottom: 44px; }
+.secao-tit h2 { font-size: clamp(30px, 3.6vw, 42px); }
+.secao-tit p { color: var(--soft); margin-top: 12px; font-size: 17px; }
+.funcoes { display: grid; gap: 72px; }
+.funcao { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 48px; align-items: center; }
+.funcao:nth-child(even) .funcao-txt { order: 2; }
+.funcao h3 { font-size: 27px; }
+.funcao p { color: var(--soft); margin-top: 10px; }
+.funcao ul { margin: 16px 0 0; padding: 0; list-style: none; display: grid; gap: 9px; }
+.funcao li { padding-left: 22px; position: relative; font-size: 15.5px; }
+.funcao li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 10px; height: 2px; background: var(--gold); }
+.tag-edu { display: inline-block; margin-left: 6px; font: 600 10.5px/1 var(--f-body); letter-spacing: .07em; text-transform: uppercase; color: var(--gold-ink); background: var(--gold-soft); padding: 4px 7px; border-radius: 4px; vertical-align: 4px; }
+.tela { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); background: #f6f4ef; }
+.tela img { width: 100%; height: auto; cursor: zoom-in; }
+.tela.estreita { max-width: 420px; margin-inline: auto; }
+.tela.doc { max-width: 500px; margin-inline: auto; background: #fff; }
+.legenda-tela { font-size: 12.5px; color: var(--soft); margin-top: 10px; text-align: center; }
+
+/* vídeo */
+.video-bloco { background: var(--card); border-block: 1px solid var(--line); }
+.video-grade { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 56px; align-items: center; }
+.video-grade .secao-tit { margin-bottom: 0; }
+.video-grade ul { margin: 22px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.video-grade li { padding-left: 22px; position: relative; font-size: 15.5px; }
+.video-grade li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 10px; height: 2px; background: var(--gold); }
+.celular { width: 100%; max-width: 340px; margin-inline: auto; border-radius: 30px; padding: 10px; background: #1c1916; box-shadow: var(--shadow); }
+.celular video { display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; border-radius: 22px; background: #0d2a18; object-fit: cover; }
+
+.passos-bloco { background: var(--card); border-block: 1px solid var(--line); }
+.passos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; counter-reset: p; }
+.passos li { position: relative; padding-top: 52px; counter-increment: p; }
+.passos li::before { content: counter(p); position: absolute; top: 0; left: 0; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--brand); color: var(--brand-ink); font: 700 16px/1 var(--f-body); }
+.passos li::after { content: ""; position: absolute; top: 17px; left: 46px; right: -18px; height: 2px; background: var(--gold); opacity: .55; }
+.passos li:last-child::after { display: none; }
+.passos b { display: block; font-size: 17px; margin-bottom: 6px; }
+.passos p { font-size: 15px; color: var(--soft); }
+.obs { margin-top: 30px; font-size: 14.5px; color: var(--soft); }
+
+.compra { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+.compra-info { padding: 36px; display: flex; flex-direction: column; gap: 18px; }
+.compra-info h2 { font-size: 34px; }
+.compra-valor { font: 700 44px/1 var(--f-body); letter-spacing: -.02em; }
+.compra-valor small { display: block; font: 500 14px/1.4 var(--f-body); color: var(--soft); letter-spacing: 0; margin-top: 8px; }
+.inclui { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 15px; }
+.inclui li { padding-left: 26px; position: relative; }
+.inclui li::before { content: ""; position: absolute; left: 2px; top: .35em; width: 12px; height: 7px; border-left: 2px solid var(--brand); border-bottom: 2px solid var(--brand); transform: rotate(-45deg); }
+:root[data-theme="dark"] .inclui li::before { border-color: var(--gold); }
+.compra-pix { padding: 36px; background: var(--brand-soft); border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 16px; }
+.compra-pix h3 { font: 700 13px/1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--brand); }
+:root[data-theme="dark"] .compra-pix h3 { color: var(--gold); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .compra-pix h3, :root:not([data-theme="light"]) .inclui li::before { color: var(--gold); border-color: var(--gold); } }
+.pix-linha { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+.qr { width: 188px; height: 188px; background: #ffffff; border-radius: 10px; padding: 12px; flex: none; display: grid; place-items: center; border: 1px solid var(--line); }
+.qr img, .qr canvas { width: 164px !important; height: 164px !important; }
+.qr-vazio { color: #5b6167; font-size: 12.5px; text-align: center; line-height: 1.4; }
+.pix-txt { flex: 1; min-width: 200px; font-size: 14.5px; display: grid; gap: 8px; }
+.pix-txt .rec { font-size: 13.5px; color: var(--soft); }
+.pix-txt .rec b { color: var(--ink); }
+.copia { display: flex; gap: 8px; }
+.copia input { flex: 1; min-width: 0; font: 400 12.5px/1.2 ui-monospace, 'Cascadia Mono', Consolas, monospace; padding: 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--card); color: var(--ink); }
+.depois { border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 10px; }
+.depois p { font-size: 14px; color: var(--soft); }
+.zap { font-size: 13.5px; color: var(--soft); }
+.zap b { color: var(--ink); user-select: all; }
+.alerta-golpe { font-size: 13px; color: var(--soft); }
+
+.duas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
+.caixa { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 28px; }
+.caixa h3 { font-size: 24px; margin-bottom: 14px; }
+.tabela { width: 100%; border-collapse: collapse; font-size: 15px; }
+.tabela th { text-align: left; font-weight: 500; color: var(--soft); padding: 9px 12px 9px 0; border-bottom: 1px solid var(--line); width: 46%; vertical-align: top; }
+.tabela td { padding: 9px 0; border-bottom: 1px solid var(--line); }
+.tabela tr:last-child th, .tabela tr:last-child td { border-bottom: 0; }
+
+.faq { max-width: 780px; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary { cursor: pointer; list-style: none; padding: 18px 36px 18px 0; font-weight: 600; font-size: 16.5px; position: relative; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; position: absolute; right: 4px; top: 13px; font: 400 24px/1 var(--f-body); color: var(--gold); }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { padding: 0 0 18px; color: var(--soft); max-width: 62ch; }
+
+.termos { max-width: 780px; margin-top: 40px; }
+.termos summary { cursor: pointer; font-weight: 600; color: var(--brand); }
+:root[data-theme="dark"] .termos summary { color: var(--gold); }
+.termos-txt { margin-top: 16px; font-size: 14px; color: var(--soft); display: grid; gap: 10px; max-height: 420px; overflow-y: auto; padding: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.termos-txt h4 { margin: 8px 0 0; color: var(--ink); font-size: 13px; letter-spacing: .04em; }
+
+.aviso { font-size: 13.5px; color: var(--soft); max-width: 780px; margin-top: 36px; padding-left: 14px; border-left: 3px solid var(--gold); }
+
+.rodape { border-top: 1px solid var(--line); margin-top: 20px; }
+.rodape .wrap { display: flex; gap: 16px 32px; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; padding-block: 26px 34px; font-size: 12.5px; color: var(--soft); }
+.rodape .emp { max-width: 640px; line-height: 1.6; }
+.rodape .dev { white-space: nowrap; letter-spacing: .06em; opacity: .8; }
+.rodape .dev b { font-weight: 700; }
+.rodape .dev i { display: inline-block; width: 1px; height: 11px; background: var(--gold); margin: 0 6px; vertical-align: -1px; }
+
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 8px; font-size: 14px; z-index: 20; }
+
+/* ampliar tela */
+.zoom { border: 0; padding: 0; background: transparent; max-width: min(1400px, 96vw); max-height: 94vh; }
+.zoom::backdrop { background: rgba(10,8,6,.82); }
+.zoom img { max-width: 100%; max-height: 90vh; width: auto; height: auto; border-radius: 8px; background: #fff; }
+.zoom button { position: fixed; top: 14px; right: 14px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #fff; color: #1a1c1e; font-size: 22px; cursor: pointer; }
+
+@media (max-width: 900px) {
+  .heroi .wrap, .funcao, .compra, .duas, .video-grade { grid-template-columns: minmax(0, 1fr); }
+  .heroi { padding-block: 36px 28px; }
+  .heroi .wrap { gap: 34px; }
+  .funcao { gap: 22px; }
+  .funcao:nth-child(even) .funcao-txt { order: 0; }
+  .funcoes { gap: 56px; }
+  .video-grade { gap: 32px; }
+  .faixa ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .passos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .passos li::after { display: none; }
+  .compra-pix { border-left: 0; border-top: 1px solid var(--line); }
+  .secao { padding-block: 56px; }
+  .topo nav a.opc { display: none; }
+}
+@media (max-width: 520px) {
+  .faixa ul, .passos { grid-template-columns: minmax(0, 1fr); }
+  .compra-info, .compra-pix { padding: 24px 20px; }
+  .topo nav { gap: 14px; }
+  .topo .wrap { gap: 12px; }
+  .logo img { height: 21px; }
+  .qr { margin: 0 auto; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+
+<div class="rascunho" id="rascunho" hidden><div class="wrap" id="rascunho-txt"></div></div>
+
+<header class="topo">
+  <div class="wrap">
+    <a class="logo" href="#topo" aria-label="OS Solution">
+      <img class="l-claro" src="data:image/png;base64,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" alt="OS Solution" width="440" height="70">
+      <img class="l-escuro" src="data:image/png;base64,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" alt="OS Solution" width="440" height="70">
+    </a>
+    <nav aria-label="Seções">
+      <a class="opc" href="#video">Ver funcionando</a>
+      <a class="opc" href="#funcoes">O que faz</a>
+      <a class="opc" href="#como-comprar">Como comprar</a>
+      <a href="#perguntas">Dúvidas</a>
+    </nav>
+    <a class="btn btn-p btn-sm" href="#comprar">Comprar</a>
+  </div>
+</header>
+
+<main id="topo">
+  <section class="heroi">
+    <div class="wrap">
+      <div>
+        <span class="selo">Programa para Windows · Orçamento de Móveis Planejados</span>
+        <h1>Digite as medidas. O orçamento sai pronto, com o preço certo.</h1>
+        <p class="lead">O programa calcula o MDF, a fita e as ferragens de cada móvel, mostra o custo e o preço com a sua margem, monta o orçamento do cliente com a sua logo e entrega a lista para a fábrica. Sem mensalidade e sem internet.</p>
+        <div class="preco"><strong class="num" data-preco>R$ —</strong><span>pagamento único · licença vitalícia</span></div>
+        <p class="lanc" data-lanc hidden></p>
+        <div class="acoes">
+          <a class="btn btn-p" href="#comprar">Comprar com Pix</a>
+          <a class="btn btn-s" href="#video">Ver funcionando</a>
+        </div>
+        <ul class="garantias">
+          <li>Sem mensalidade</li>
+          <li>Garantia técnica de 90 dias</li>
+          <li>Windows 10 e 11</li>
+        </ul>
+      </div>
+      <figure class="janela" style="margin:0">
+        <div class="janela-barra" aria-hidden="true"><b>Orçamento de Móveis Planejados</b><i>—</i><i>▢</i><i>✕</i></div>
+        <img src="img/calcular-movel.webp" alt="Tela Calcular móvel: medidas de um guarda-roupa, custo dos insumos, preço final, preço por metro linear e MDF usado" width="1400" height="1186" fetchpriority="high">
+      </figure>
+    </div>
+  </section>
+
+  <section class="faixa" aria-label="Vantagens">
+    <div class="wrap">
+      <ul>
+        <li><b>Orçamento no mesmo dia</b><span>Medida digitada, preço na hora. Responda antes da concorrência.</span></li>
+        <li><b>Nada esquecido</b><span>Chapas, fita, dobradiças e corrediças pela regra técnica, peça por peça.</span></li>
+        <li><b>Sua margem protegida</b><span>O preço sai com a sua porcentagem, e ele avisa se ficar abaixo do mínimo.</span></li>
+        <li><b>Sem internet e sem mensalidade</b><span>Preços e clientes ficam só no seu computador, com backup diário.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="secao video-bloco" id="video">
+    <div class="wrap video-grade">
+      <div>
+        <div class="secao-tit">
+          <h2>Veja funcionando</h2>
+          <p>Uma gravação real do programa: o orçamento de uma cozinha, do cálculo à lista da fábrica, em cerca de três minutos de tela.</p>
+        </div>
+        <ul>
+          <li>Calcula o metro quadrado de MDF de cada peça e mostra quanto custa</li>
+          <li>Você decide a porcentagem, e o preço sai por metro linear e por m² de frente</li>
+          <li>A sua equipe faz o orçamento só digitando as medidas, e você confere e aprova</li>
+          <li>Pedido fechado: chapas, fita e ferragens de todos os móveis somadas para comprar de uma vez</li>
+        </ul>
+      </div>
+      <div class="celular">
+        <video src="img/video-orcamento-moveis.mp4" poster="img/video-capa.webp" controls playsinline preload="none" width="720" height="1280" aria-label="Vídeo de apresentação do Orçamento de Móveis Planejados, com narração"></video>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao" id="funcoes">
+    <div class="wrap">
+      <div class="secao-tit">
+        <h2>Da medida à compra do material</h2>
+        <p>Você digita as medidas e escolhe portas, gavetas e acabamento. O programa faz o resto. As telas abaixo usam dados e preços de exemplo; clique para ampliar.</p>
+      </div>
+      <div class="funcoes">
+        <article class="funcao">
+          <div class="funcao-txt">
+            <h3>Qualquer móvel, módulo a módulo</h3>
+            <p>Guarda-roupa, closet, cozinha, home, gaveteiro e estofados, e uma lista livre para montar outros projetos.</p>
+            <ul>
+              <li>Cozinha com aéreo, balcão, gaveteiro, porta basculante e caixa de geladeira</li>
+              <li>Home com rack e painel liso, ripado ou frisado</li>
+              <li>Diversas peças: painéis, prateleiras, nichos, mesas, portas de correr e de alumínio</li>
+            </ul>
+          </div>
+          <div><div class="tela"><img src="img/cozinha-modulos.webp" alt="Cozinha montada módulo a módulo: aéreo com portas de abrir e basculante, balcão com gaveteiro, e o custo ao lado" width="1400" height="1008" loading="lazy" decoding="async"></div></div>
+        </article>
+
+        <article class="funcao">
+          <div class="funcao-txt">
+            <h3>Custo real e preço certo</h3>
+            <p>Saiba quanto custa cada móvel antes de passar o preço ao cliente.</p>
+            <ul>
+              <li>Metro quadrado de MDF de cada peça; a sobra fica para reaproveitar e não entra no custo</li>
+              <li>Preço final com a sua porcentagem e a mão de obra, por metro linear e por m² de frente</li>
+              <li>Compara com o preço por metro linear que você cobra hoje e avisa quando ele não cobre os materiais</li>
+              <li>Alerta quando o preço fica abaixo do mínimo que você definiu</li>
+            </ul>
+          </div>
+          <div><div class="tela estreita"><img src="img/custo-e-preco.webp" alt="Custo dos insumos, preço final, composição do custo e comparação com o preço por metro linear, com o aviso de que esse preço não cobre os insumos" width="760" height="1307" loading="lazy" decoding="async"></div></div>
+        </article>
+
+        <article class="funcao">
+          <div class="funcao-txt">
+            <h3>Lista pronta para a fábrica</h3>
+            <p>O romaneio sai junto com o orçamento, sem fazer conta à mão.</p>
+            <ul>
+              <li>Chapas a comprar pelo aproveitamento do corte</li>
+              <li>Ferragens com quantidade e valor; dobradiças pelo peso e pela altura da porta</li>
+              <li>Fita de borda só onde aparece e lista de peças com as medidas</li>
+              <li>Um clique copia tudo para colar no WhatsApp da fábrica</li>
+            </ul>
+          </div>
+          <div><div class="tela"><img src="img/romaneio-fabrica.webp" alt="Romaneio da fábrica com chapas de MDF a comprar, ferragens e fita de borda" width="1400" height="1137" loading="lazy" decoding="async"></div></div>
+        </article>
+
+        <article class="funcao">
+          <div class="funcao-txt">
+            <h3>Orçamento do cliente por ambiente</h3>
+            <p>Junte vários móveis e serviços num orçamento só.</p>
+            <ul>
+              <li>Ambientes, desconto, entrada e parcelas calculados</li>
+              <li>Instalação, frete e outros itens do seu catálogo de produtos (importa planilha do Excel)</li>
+              <li>Situação de cada orçamento: rascunho, enviado, aprovado ou recusado</li>
+              <li>O seu custo e a sua margem aparecem só para você</li>
+            </ul>
+          </div>
+          <div><div class="tela"><img src="img/orcamento-cliente.webp" alt="Orçamento do cliente com itens por ambiente, totais, desconto, entrada e parcelas" width="1400" height="1056" loading="lazy" decoding="async"></div></div>
+        </article>
+
+        <article class="funcao">
+          <div class="funcao-txt">
+            <h3>PDF profissional com a sua logo</h3>
+            <p>O cliente recebe um orçamento organizado, pronto para assinar.</p>
+            <ul>
+              <li>A sua logo e os dados da sua empresa no topo</li>
+              <li>Condições de pagamento, prazo de entrega, observações e garantia</li>
+              <li>Espaço para as assinaturas e resumo pronto para o WhatsApp</li>
+              <li>Sem o seu custo: o cliente vê só o orçamento</li>
+            </ul>
+          </div>
+          <div><div class="tela doc"><img src="img/pdf-cliente.webp" alt="PDF do orçamento para o cliente com a logo da marcenaria, itens por ambiente, condições de pagamento, garantia e assinaturas" width="1000" height="1461" loading="lazy" decoding="async"></div></div>
+        </article>
+
+        <article class="funcao">
+          <div class="funcao-txt">
+            <h3>Pedido fechado, compra de uma vez</h3>
+            <p>O romaneio do pedido soma o material de todos os móveis do orçamento aprovado.</p>
+            <ul>
+              <li>Chapas somadas no pedido inteiro: sobra menos material</li>
+              <li>Ferragens e fita de todos os móveis numa lista só</li>
+              <li>Custo dos insumos recalculado com os preços de hoje</li>
+            </ul>
+          </div>
+          <div><div class="tela"><img src="img/romaneio-pedido.webp" alt="Romaneio do pedido com dois móveis: chapas somadas, ferragens e fita de borda, e o botão para copiar e enviar à fábrica" width="1200" height="1295" loading="lazy" decoding="async"></div></div>
+        </article>
+
+        <article class="funcao">
+          <div class="funcao-txt">
+            <h3>Seus preços, suas regras <span class="tag-edu">menos sobrecarga</span></h3>
+            <p>Cadastre uma vez os preços do seu fornecedor e as regras de fabricação. Depois, outra pessoa da equipe faz o orçamento só digitando as medidas, e você confere e aprova.</p>
+            <ul>
+              <li>Chapa inteira por acabamento e espessura, ferragens e fita</li>
+              <li>Regras técnicas no padrão de norma e de fabricante, todas editáveis</li>
+              <li>Clientes cadastrados sem documentos e backup automático todos os dias</li>
+            </ul>
+          </div>
+          <div><div class="tela"><img src="img/precos-e-regras.webp" alt="Tela Preços e regras com o preço da chapa por acabamento e espessura e o preço das ferragens" width="1400" height="1032" loading="lazy" decoding="async"></div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao passos-bloco" id="como-comprar">
+    <div class="wrap">
+      <div class="secao-tit">
+        <h2>Como comprar</h2>
+        <p>A licença é feita para o computador da sua empresa. Por isso a ativação tem um passo a mais.</p>
+      </div>
+      <ol class="passos">
+        <li><b>Pague com Pix</b><p>Use o QR Code ou o código copia e cola abaixo.</p></li>
+        <li><b>Envie o comprovante</b><p>Pelo WhatsApp, com o nome da empresa para a licença e o CNPJ (ou CPF) para a nota fiscal.</p></li>
+        <li><b>Instale o programa</b><p>Você recebe o link do instalador. Ao abrir, ele mostra o código do seu computador. Envie esse código.</p></li>
+        <li><b>Ative a licença</b><p>Você recebe a licença provisória, com todas as funções, e cola no programa. Pronto. Passados os 7 dias para desistência, chega a definitiva, que não vence: é só colar do mesmo jeito.</p></li>
+      </ol>
+      <p class="obs">Enquanto a licença não chega, você já pode explorar a demonstração com dados de exemplo. A licença é enviada <span data-prazo>em até 1 dia útil</span> depois que você manda o código do computador.</p>
+    </div>
+  </section>
+
+  <section class="secao" id="comprar">
+    <div class="wrap">
+      <div class="compra">
+        <div class="compra-info">
+          <h2>Orçamento de Móveis Planejados</h2>
+          <div class="compra-valor num"><span data-preco>R$ —</span><small>Pagamento único. Sem mensalidade.</small></div>
+          <p class="lanc" data-lanc hidden></p>
+          <ul class="inclui">
+            <li>Instalador para Windows 10 e 11 (64 bits)</li>
+            <li>Licença vitalícia para 1 computador da sua empresa</li>
+            <li>Nota fiscal no CNPJ ou CPF do comprador</li>
+            <li>Reemissão grátis da licença nos primeiros 90 dias</li>
+            <li>Correção de defeitos por 90 dias</li>
+            <li>7 dias para desistir, com reembolso integral</li>
+          </ul>
+          <div id="ml" hidden><a class="btn btn-s btn-sm" id="ml-link" href="#" target="_blank" rel="noopener">Prefere comprar pelo Mercado Livre?</a></div>
+        </div>
+        <div class="compra-pix">
+          <h3>Pagar com Pix</h3>
+          <div class="pix-linha">
+            <div class="qr" id="qr"><span class="qr-vazio">O QR Code aparece aqui quando o preço e a chave Pix forem preenchidos.</span></div>
+            <div class="pix-txt">
+              <p class="rec">Recebedor: <b>OS CAPITAL LTDA</b><br>CNPJ 59.437.693/0001-27</p>
+              <p class="rec">No app do seu banco, confira o nome do recebedor e o valor antes de confirmar.</p>
+              <label for="pix-codigo" class="rec">Pix copia e cola</label>
+              <div class="copia">
+                <input id="pix-codigo" readonly value="" placeholder="disponível em breve">
+                <button class="btn btn-p btn-sm" id="copiar" type="button">Copiar</button>
+              </div>
+            </div>
+          </div>
+          <div class="depois">
+            <p>Pagou? Envie o comprovante, o nome da empresa e o CNPJ (ou CPF) para a nota:</p>
+            <div class="acoes" style="margin:0">
+              <a class="btn btn-p" id="ja-paguei" href="#comprar" target="_blank" rel="noopener">Já paguei · enviar pelo WhatsApp</a>
+              <a class="btn btn-s" id="duvida" href="#comprar" target="_blank" rel="noopener">Tirar dúvida</a>
+            </div>
+            <p class="zap">WhatsApp: <b id="zap-num">—</b></p>
+            <p class="alerta-golpe">A licença é enviada depois que o pagamento aparece na conta. Não pedimos senha, código de verificação ou acesso ao seu computador.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao" style="padding-top:0">
+    <div class="wrap duas">
+      <div class="caixa">
+        <h3>Requisitos</h3>
+        <table class="tabela">
+          <tr><th>Sistema</th><td>Windows 10 ou 11, 64 bits</td></tr>
+          <tr><th>Processador</th><td>64 bits, 2 GHz</td></tr>
+          <tr><th>Memória</th><td>4 GB</td></tr>
+          <tr><th>Espaço em disco</th><td>500 MB</td></tr>
+          <tr><th>Internet</th><td>Só para baixar o instalador</td></tr>
+          <tr><th>Mac, celular ou tablet</th><td>Sem versão: ele roda no computador para os seus dados ficarem só com você</td></tr>
+        </table>
+      </div>
+      <div class="caixa">
+        <h3>Licença e garantia</h3>
+        <table class="tabela">
+          <tr><th>Uso</th><td>Na sua empresa, 1 computador, intransferível</td></tr>
+          <tr><th>Validade</th><td>Vitalícia (licença provisória de 10 dias na compra; a definitiva chega após os 7 dias de desistência, sem custo)</td></tr>
+          <tr><th>Troca de computador</th><td>Reemissão grátis em 90 dias; depois, <span data-taxa>R$&nbsp;49</span></td></tr>
+          <tr><th>Suporte técnico</th><td>90 dias: defeitos, instalação e licença</td></tr>
+          <tr><th>Desistência</th><td>Até 7 dias, reembolso integral</td></tr>
+          <tr><th>Revenda</th><td>Proibida</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao" id="perguntas" style="padding-top:0">
+    <div class="wrap">
+      <div class="secao-tit" style="margin-bottom:24px"><h2>Dúvidas frequentes</h2></div>
+      <div class="faq">
+        <details><summary>Quais móveis ele calcula?</summary><p>Guarda-roupa, closet, cozinha (aéreo, balcão, gaveteiro, basculante e caixa de geladeira), home (rack e painel liso, ripado ou frisado), gaveteiro e estofados (cabeceira, painel e assento). Em Diversas peças você monta uma lista livre com painéis, prateleiras, nichos, mesas, portas de correr e portas de alumínio para outros projetos.</p></details>
+        <details><summary>Os preços são os do meu fornecedor?</summary><p>Sim. Na aba Preços e regras você coloca o preço da chapa inteira, das ferragens e da fita que você paga. As regras técnicas (dobradiças por porta, folgas, aproveitamento do corte) vêm no padrão de norma e de fabricante e podem ser ajustadas. Os preços que vêm no programa são só exemplos.</p></details>
+        <details><summary>Como ele calcula o MDF?</summary><p>Pelo metro quadrado de cada peça. O custo considera só o que é usado nas peças, porque a sobra é reaproveitada (você pode mudar isso). O romaneio mostra quantas chapas inteiras comprar, pelo aproveitamento do corte.</p></details>
+        <details><summary>Minha equipe pode fazer os orçamentos?</summary><p>Sim. Com os seus preços e regras cadastrados, qualquer pessoa faz o orçamento digitando as medidas, e o preço sai com a porcentagem que você escolheu. O programa avisa se o preço ficar abaixo do mínimo que você definiu. Ele não tem senha de acesso: quem usa o computador vê o custo e pode mudar preços, então combine com a equipe quem pode alterar e confira antes de enviar ao cliente.</p></details>
+        <details><summary>O cliente vê o meu custo?</summary><p>Não. O PDF e o resumo para o WhatsApp mostram só o orçamento: itens, valores, condições, prazo e garantia. O custo dos insumos e a margem ficam só na sua tela.</p></details>
+        <details><summary>Ele emite nota fiscal?</summary><p>Não. O orçamento gerado não é documento fiscal. A nota da venda dos móveis continua sendo emitida no sistema que você já usa.</p></details>
+        <details><summary>É mensalidade?</summary><p>Não. Você paga uma vez e a licença é vitalícia.</p></details>
+        <details><summary>Precisa de internet?</summary><p>Só para baixar o instalador. Depois, o programa funciona sem internet, e os seus preços, clientes e orçamentos ficam só no seu computador.</p></details>
+        <details><summary>Apareceu “O Windows protegeu o computador”. E agora?</summary><p>É normal em programas de desenvolvedores independentes. Clique em “Mais informações” e depois em “Executar assim mesmo”.</p></details>
+        <details><summary>Posso usar em dois computadores?</summary><p>Cada licença vale para um computador. Para outro, adquira uma licença adicional.</p></details>
+        <details><summary>Se eu formatar o computador, perco tudo?</summary><p>Faça um backup antes (aba Sua empresa). O programa também guarda uma cópia automática por dia. Depois envie o novo código do computador e a licença é reemitida: grátis nos primeiros 90 dias e, depois, por <span data-taxa>R$&nbsp;49</span>.</p></details>
+        <details><summary>O que o suporte inclui?</summary><p>Nos primeiros 90 dias, por escrito: correção de defeitos do programa, ajuda para instalar e ativar a licença e reemissão da licença. Não inclui ensinar a usar as funções, treinamento, montar orçamentos, cadastrar preços, chamadas de vídeo, acesso remoto ou problemas do computador e do Windows. Para aprender a usar, o programa tem a tela Ajuda e a demonstração com dados de exemplo.</p></details>
+        <details><summary>E se eu não gostar?</summary><p>Você pode desistir em até 7 dias e recebe o valor integral pelo mesmo Pix.</p></details>
+        <details><summary>Por que a licença chega em duas etapas?</summary><p>Na compra você recebe uma licença provisória, com todas as funções, válida por 10 dias. Passado o prazo de 7 dias para desistência, enviamos a licença definitiva, sem custo, pelo mesmo WhatsApp. Você cola do mesmo jeito e os seus dados continuam lá. O programa avisa antes de a provisória vencer.</p></details>
+      </div>
+
+      <details class="termos" id="termos">
+        <summary>Ler o contrato de licença de uso</summary>
+        <div class="termos-txt"><h4>CONTRATO DE LICENÇA DE USO DE SOFTWARE</h4>
+<p>ORÇAMENTO DE MÓVEIS PLANEJADOS — versão 1.2</p>
+<p>Desenvolvido por OS Solution</p>
+<p>Licenciante: a empresa titular da marca OS Solution, identificada (razão social, CNPJ e endereço) no anúncio e na nota fiscal da compra.</p>
+<p>Licenciado: a pessoa ou empresa que adquiriu a licença, identificada pelo nome e número do pedido gravados no código de licença.</p>
+<p>Ao instalar, ativar ou usar o programa, o Licenciado declara ter lido e aceito este contrato.</p>
+<h4>1. OBJETO</h4>
+<p>Este contrato concede licença de uso do programa Orçamento de Móveis Planejados, nos termos da Lei 9.609/1998. O programa é licenciado, não vendido. Todos os direitos de autor pertencem ao Licenciante.</p>
+<h4>2. ALCANCE DA LICENÇA</h4>
+<p>A licença é intransferível, não exclusiva, sem prazo de expiração (vitalícia) e válida para um único computador, identificado pelo código gerado na ativação. Pode ser usada nas atividades da empresa do Licenciado. A licença é entregue em duas etapas: na compra, o Licenciado recebe uma licença provisória, com todas as funções, válida por no mínimo 10 dias, com a data de vencimento mostrada no programa; depois do prazo de desistência (cláusula 12), o Licenciante envia a licença definitiva pelo mesmo canal da compra, sem custo adicional. O programa avisa antes do vencimento. Se a licença provisória vencer antes da ativação da definitiva, o programa deixa de gravar até que ela seja ativada, sem apagar os dados já gravados; basta pedir a licença definitiva pelo canal da compra.</p>
+<h4>3. PROIBIÇÕES</h4>
+<p>É proibido: revender, sublicenciar, alugar, emprestar, ceder ou distribuir o programa ou o código de licença; publicar o instalador ou o código de licença em sites, grupos ou redes; copiar, descompilar, modificar ou burlar a proteção de licença, ou remover a identificação de autoria; usar o programa em mais de um computador ao mesmo tempo sem licença adicional. A violação de direitos de autor de programa de computador é crime (Lei 9.609/1998, art. 12) e encerra a licença sem direito a reembolso.</p>
+<h4>4. IDENTIFICAÇÃO</h4>
+<p>O código de licença contém o nome do Licenciado, o número do pedido e o código do computador autorizado. O nome e o pedido aparecem no programa, o que permite identificar cópias distribuídas sem autorização.</p>
+<h4>5. TROCA DE COMPUTADOR</h4>
+<p>Em caso de formatação ou troca de equipamento, o Licenciado pode pedir a reemissão da licença pelo canal da compra, informando o novo código do computador. A reemissão é gratuita durante a validade técnica e, depois dela, é feita mediante a taxa informada no canal de venda. A licença anterior deixa de ser autorizada.</p>
+<h4>6. VALIDADE TÉCNICA E SUPORTE</h4>
+<p>O prazo de validade técnica desta versão é de 90 dias a contar da data da compra (Lei 9.609/1998, art. 7º). Nesse prazo, o Licenciante presta, sem custo adicional, somente os serviços técnicos relativos ao funcionamento do programa (art. 8º): correção de defeitos do programa, orientação para instalar e ativar a licença e reemissão de licença, por escrito, pelo canal da compra. Não estão incluídos: ensinar a usar as funções do programa, treinamento, ajuda para lançar dados, montar orçamentos ou cadastrar preços, atendimento por telefone ou vídeo, acesso remoto ao computador e problemas do computador, do Windows ou de outros programas. Para aprender a usar, o programa oferece a tela Ajuda e a demonstração com dados de exemplo. Após esse prazo, o Licenciado continua com o direito de uso; suporte e reemissão de licença passam a ser oferecidos quando disponíveis, mediante a taxa informada no canal de venda.</p>
+<h4>7. REQUISITOS</h4>
+<p>O programa funciona em Windows 10 ou 11, 64 bits. Não funciona em Mac, celular ou tablet. O Licenciante não responde por mau funcionamento causado por sistema incompatível, vírus, falha de hardware ou alteração do programa por terceiros.</p>
+<h4>8. DADOS</h4>
+<p>As informações ficam gravadas apenas no computador do Licenciado, na pasta Documentos. O programa não se conecta à internet e o Licenciante não coleta nem acessa nenhuma informação inserida. O programa faz cópias automáticas diárias no próprio computador; guardar cópias fora dele (pendrive ou nuvem) é responsabilidade do Licenciado. Os dados dos clientes do Licenciado (nome, telefone, e-mail e endereço da obra) são tratados pelo próprio Licenciado, que é o responsável por eles perante a Lei 13.709/2018 (LGPD); o programa não guarda CPF, CNPJ nem outros documentos dos clientes.</p>
+<h4>9. FINALIDADE E CONFERÊNCIA DOS CÁLCULOS</h4>
+<p>O programa calcula estimativas de consumo de material e de custo a partir das medidas, configurações, preços e regras técnicas informados ou ajustados pelo Licenciado. Os valores padrão de preços e regras são exemplos e devem ser trocados pelos do Licenciado. Listas de peças, chapas, ferragens, fita e romaneios devem ser conferidos pelo Licenciado ou pela fábrica antes da compra de material e do corte. O preço de venda, a margem, os prazos, as condições de pagamento e os textos de observações e de garantia são definidos pelo Licenciado; os textos que acompanham o programa são modelos e devem ser revisados por quem o Licenciado escolher. O orçamento gerado não é documento fiscal.</p>
+<h4>10. LOGO E NOME DO LICENCIADO</h4>
+<p>A logo e os dados da empresa inseridos pelo Licenciado são de sua responsabilidade, que declara ter direito de usá-los.</p>
+<h4>11. RESPONSABILIDADE</h4>
+<p>O Licenciante responde pelos defeitos do programa nos termos da lei. Não responde por perda de dados sem backup, uso em desacordo com este contrato, erros de medida, de preço ou de configuração informados pelo Licenciado, nem por perdas, lucros cessantes ou prejuízos decorrentes de orçamentos, compras de material ou cortes feitos sem a conferência prevista na cláusula 9. Quando o Licenciado não for consumidor (empresa que usa o programa como ferramenta da sua atividade), a responsabilidade do Licenciante fica limitada ao valor pago pela licença, salvo dolo ou culpa grave.</p>
+<h4>12. DESISTÊNCIA E REEMBOLSO</h4>
+<p>O Licenciado pode desistir da compra em até 7 dias corridos e recebe o valor integral (CDC, art. 49, aplicado a todos os compradores como política do Licenciante). Com o reembolso, a licença é cancelada, a licença definitiva não é emitida (a provisória vence na data indicada e não é renovada) e o Licenciado deve desinstalar o programa; o uso após o reembolso é uso não licenciado.</p>
+<h4>13. ATUALIZAÇÕES</h4>
+<p>Correções de defeitos da versão adquirida são gratuitas durante a validade técnica. Novas versões com funções adicionais podem exigir nova licença.</p>
+<h4>14. ENCERRAMENTO</h4>
+<p>A licença se encerra pelo reembolso ou pela violação deste contrato. Encerrada a licença, o Licenciado deve desinstalar o programa.</p>
+<h4>15. FORO</h4>
+<p>Aplica-se a lei brasileira. Quando o Licenciado for consumidor, fica eleito o foro do seu domicílio (CDC, art. 101). Nos demais casos, fica eleito o foro da sede do Licenciante.</p>
+<p>Componentes de terceiros: Electron (licença MIT), TweetNaCl-js (domínio público).</p></div>
+      </details>
+
+      <p class="aviso">Ferramenta de cálculo e orçamento. Os resultados são estimativas feitas com as suas medidas, preços e regras: confira a lista de peças e de chapas com a fábrica antes de comprar o material e cortar. O orçamento gerado não é documento fiscal.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="rodape">
+  <div class="wrap">
+    <p class="emp">OS Solution é uma marca de OS CAPITAL LTDA · CNPJ 59.437.693/0001-27 · Av. Paulista, 1636, Bela Vista, São Paulo/SP, CEP 01310-200<span data-email></span> · <a href="#termos">Contrato de licença</a></p>
+    <p class="dev">Desenvolvido por <b>OS</b><i></i>SOLUTION</p>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" hidden></div>
+<dialog class="zoom" id="zoom" aria-label="Tela ampliada"><button type="button" id="zoom-fechar" aria-label="Fechar">✕</button><img id="zoom-img" alt=""></dialog>
+
+<script src="vendor/qrcode.min.js"></script>
+<script>
+/* ===================== CONFIGURAÇÃO (preencha aqui) =====================
+   preco:        "599,00"  (só números, com vírgula)
+   precoDepois:  preço depois de uma promoção ("" para não mostrar)
+   chavePix:     chave da conta PJ: CNPJ só com números ou chave aleatória
+   whatsapp:     DDD + número, só números
+   email:        e-mail de contato (exigido para venda pela internet)
+   taxaReemissao: reemissão da licença depois dos 90 dias
+   mercadoLivre: link do anúncio, quando existir (senão deixe "")
+========================================================================== */
+const CONFIG = {
+  preco: "599,00",
+  precoDepois: "",
+  vagasLancamento: 0,
+  chavePix: "59437693000127",
+  nomeRecebedor: "OS CAPITAL LTDA",
+  cidade: "SAO PAULO",
+  whatsapp: "11912447979",
+  email: "ossolutionoficial@gmail.com",
+  prazoResposta: "em até 1 dia útil",
+  taxaReemissao: "49,00",
+  mercadoLivre: ""
+};
+
+(function () {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => document.querySelectorAll(s);
+  const so = (s) => String(s || '').trim();
+  const numBR = (s) => Number(so(s).replace(/\./g, '').replace(',', '.'));
+  const fmtBRL = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  // ---- Pix (BR Code estático, padrão do Banco Central) ----
+  const tlv = (id, v) => id + String(v.length).padStart(2, '0') + v;
+  const limpa = (s) => so(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim();
+  function crc16(s) {
+    let c = 0xFFFF;
+    for (let i = 0; i < s.length; i++) {
+      c ^= s.charCodeAt(i) << 8;
+      for (let j = 0; j < 8; j++) c = (c & 0x8000) ? ((c << 1) ^ 0x1021) & 0xFFFF : (c << 1) & 0xFFFF;
+    }
+    return c.toString(16).toUpperCase().padStart(4, '0');
+  }
+  function chaveNormalizada(k) {
+    k = so(k);
+    const dig = k.replace(/\D/g, '');
+    if (/^[\d.\-\/\s]+$/.test(k) && dig.length === 14) return dig; // CNPJ
+    return k.toLowerCase();                                          // chave aleatória ou e-mail
+  }
+  function brcode(chave, valor, nome, cidade) {
+    const conta = tlv('00', 'br.gov.bcb.pix') + tlv('01', chave);
+    const p = tlv('00', '01') + tlv('26', conta) + tlv('52', '0000') + tlv('53', '986') +
+      (valor ? tlv('54', valor) : '') + tlv('58', 'BR') + tlv('59', limpa(nome).slice(0, 25)) +
+      tlv('60', limpa(cidade).slice(0, 15)) + tlv('62', tlv('05', 'ORCMOVEIS')) + '6304';
+    return p + crc16(p);
+  }
+  window.__pix = { brcode, crc16 };
+
+  // ---- preço ----
+  const precoNum = numBR(CONFIG.preco);
+  const temPreco = precoNum > 0;
+  const precoTxt = temPreco ? fmtBRL(precoNum) : 'R$ —';
+  $$('[data-preco]').forEach((el) => { el.textContent = precoTxt; });
+  const depoisNum = numBR(CONFIG.precoDepois);
+  if (temPreco && depoisNum > precoNum) {
+    const txt = CONFIG.vagasLancamento > 0 ? 'Preço de lançamento para os primeiros ' + CONFIG.vagasLancamento + ' clientes. Depois, ' + fmtBRL(depoisNum) + '.' : 'Preço promocional. Depois, ' + fmtBRL(depoisNum) + '.';
+    $$('[data-lanc]').forEach((el) => { el.textContent = txt; el.hidden = false; });
+  }
+  $$('[data-prazo]').forEach((el) => { el.textContent = so(CONFIG.prazoResposta) || 'em até 1 dia útil'; });
+  const taxa = numBR(CONFIG.taxaReemissao);
+  if (taxa > 0) $$('[data-taxa]').forEach((el) => { el.textContent = fmtBRL(taxa).replace(',00', ''); });
+  if (so(CONFIG.email)) $$('[data-email]').forEach((el) => { el.textContent = ' · ' + so(CONFIG.email); });
+
+  // ---- Pix ----
+  const chave = chaveNormalizada(CONFIG.chavePix);
+  const campo = $('#pix-codigo');
+  if (temPreco && chave) {
+    const codigo = brcode(chave, precoNum.toFixed(2), CONFIG.nomeRecebedor, CONFIG.cidade);
+    campo.value = codigo;
+    const qr = $('#qr');
+    qr.innerHTML = '';
+    if (window.QRCode) {
+      new QRCode(qr, { text: codigo, width: 328, height: 328, colorDark: '#1a1c1e', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+    } else {
+      qr.innerHTML = '<span class="qr-vazio">Use o Pix copia e cola ao lado.</span>';
+    }
+  }
+
+  // ---- copiar ----
+  const toast = $('#toast'); let tt;
+  function aviso(msg) { toast.textContent = msg; toast.hidden = false; clearTimeout(tt); tt = setTimeout(() => { toast.hidden = true; }, 2600); }
+  $('#copiar').addEventListener('click', () => {
+    if (!campo.value) { aviso('O código Pix ainda não foi publicado.'); return; }
+    const sel = () => { campo.focus(); campo.select(); aviso('Código selecionado. Copie com Ctrl+C ou segure o dedo.'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(campo.value).then(() => aviso('Código Pix copiado. Cole no app do seu banco.'), sel);
+    } else sel();
+  });
+
+  // ---- Indicação: ?ind=CÓDIGO (nº do pedido de quem indicou). Guardada no navegador sem prazo,
+  // com chave própria deste produto. Só letras, números e hífen (até 20).
+  const indOk = (v) => typeof v === 'string' && /^[A-Za-z0-9-]{1,20}$/.test(v);
+  let ind = '';
+  try { const q = new URLSearchParams(location.search).get('ind'); if (indOk(q)) ind = q; } catch (e) { /* ignora */ }
+  try { if (ind) localStorage.setItem('osc.ind.moveis', ind); else { const g = localStorage.getItem('osc.ind.moveis'); if (indOk(g)) ind = g; } } catch (e) { /* sem armazenamento: vale nesta visita */ }
+  const comInd = (m) => { if (!ind) return m; const i = m.lastIndexOf('\n'); return i < 0 ? m + '\nIndicação: ' + ind : m.slice(0, i) + '\nIndicação: ' + ind + m.slice(i); };
+
+  // ---- WhatsApp ----
+  const zap = so(CONFIG.whatsapp).replace(/\D/g, '');
+  const zapFull = zap ? (zap.startsWith('55') && zap.length > 11 ? zap : '55' + zap) : '';
+  const linkZap = (msg) => 'https://wa.me/' + zapFull + '?text=' + encodeURIComponent(msg);
+  if (zapFull) {
+    $('#ja-paguei').href = linkZap(comInd('Olá! Paguei o Orçamento de Móveis Planejados pelo Pix (' + precoTxt + '). Segue o comprovante.\nCNPJ (ou CPF) para a nota fiscal: \nNome da empresa para a licença: '));
+    $('#duvida').href = linkZap('Olá! Tenho uma dúvida sobre o Orçamento de Móveis Planejados: ');
+    const d = zapFull.slice(2);
+    $('#zap-num').textContent = d.length === 11 ? '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7) : d;
+  } else {
+    ['#ja-paguei', '#duvida'].forEach((s) => { const a = $(s); a.removeAttribute('target'); a.addEventListener('click', (e) => { e.preventDefault(); aviso('O WhatsApp ainda não foi publicado.'); }); });
+  }
+
+  // ---- Mercado Livre ----
+  if (/^https:\/\//.test(so(CONFIG.mercadoLivre))) { $('#ml-link').href = so(CONFIG.mercadoLivre); $('#ml').hidden = false; }
+
+  // ---- ampliar as telas ----
+  const zoom = $('#zoom'), zimg = $('#zoom-img');
+  if (zoom && typeof zoom.showModal === 'function') {
+    document.addEventListener('click', (e) => {
+      const img = e.target.closest('.tela img');
+      if (!img) return;
+      zimg.src = img.currentSrc || img.src; zimg.alt = img.alt;
+      zoom.showModal();
+    });
+    $('#zoom-fechar').addEventListener('click', () => zoom.close());
+    zoom.addEventListener('click', (e) => { if (e.target === zoom) zoom.close(); });
+  }
+
+  // ---- aviso de rascunho (só aparece enquanto faltar algo) ----
+  const falta = [];
+  if (!temPreco) falta.push('preço');
+  if (!chave) falta.push('chave Pix');
+  if (!zapFull) falta.push('WhatsApp');
+  if (!so(CONFIG.email)) falta.push('e-mail');
+  if (falta.length) { $('#rascunho-txt').textContent = 'Rascunho: falta preencher ' + falta.join(', ') + '. Não divulgue esta página antes disso.'; $('#rascunho').hidden = false; }
+})();
+</script>
+
+</body>
+</html>
